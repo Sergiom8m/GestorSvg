@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="apache-jakarta-commons-httpclient">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/apache-jakarta-commons-httpclient.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
