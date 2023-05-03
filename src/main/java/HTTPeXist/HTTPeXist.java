@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -41,7 +43,7 @@ public class HTTPeXist {
 		connect.connect();
 		System.out.println("<--READ-status: " + connect.getResponseCode());
 
-		/* Lee el contenido del mensaje de respuesta- RECUSRSO */
+		/* Lee el contenido del mensaje de respuesta- RECURSO */
 		InputStream connectInputStream = connect.getInputStream();
 		InputStreamReader inputStreamReader = new InputStreamReader(connectInputStream);
 		BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
@@ -54,10 +56,29 @@ public class HTTPeXist {
 	}
 
 	/* -->LIST lista los recursos en una coleccion */
-	public String list(String collection) {
+	public String list(String collection) throws IOException {
 		String lista = new String();
 
-		// FALTA EL CODIGO
+		URL url = new URL(
+				this.server + "/exist/rest" + XmldbURI.ROOT_COLLECTION_URI + "/" + collection);
+		HttpURLConnection connect = (HttpURLConnection) url.openConnection();
+		connect.setRequestMethod("GET");
+
+		/* Crear codigo de autorizacion y meter en la cabecera Authorization */
+		String codigoBase64 = getAuthorizationCode("admin", "admin");
+		connect.setRequestProperty("Authorization", "Basic " + codigoBase64);
+		connect.connect();
+		System.out.println("<--READ-status: " + connect.getResponseCode());
+
+		/* Lee el contenido del mensaje de respuesta- RECURSO */
+		InputStream connectInputStream = connect.getInputStream();
+		InputStreamReader inputStreamReader = new InputStreamReader(connectInputStream);
+		BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+		String line;
+		while ((line = bufferedReader.readLine()) != null) {
+			lista = lista + line + "\n";
+			System.out.println("<--READ: " + line);
+		}
 
 		return lista;
 	}
@@ -106,30 +127,94 @@ public class HTTPeXist {
 
 	}
 
-	/* -->DELETE borrar un reurso */
-	public int delete(String collection, String resourceName) {
-		int status = 0;
-
-		// FALTA EL CODIGO
-
-		return status;
-
-	}
 
 	/*-->SUBIR recurso en un String */
 	public int subirString(String collection, String resource, String resourceName) throws IOException {
 		int status = 0;
 
-		// FALTA EL CODIGO
+		System.out.println("-->SUBIR: " + resourceName + " a " + collection);
+		URL url = new URL(
+				this.server + "/exist/rest" + XmldbURI.ROOT_COLLECTION_URI + "/" + collection);
+		System.out.println("-->SUBIR-url: " + url);
+		HttpURLConnection connect = (HttpURLConnection) url.openConnection();
+		connect.setRequestMethod("GET");
+		connect.connect();
+		status = connect.getResponseCode();
+
+		if(status != 404) {
+			URL url2 = new URL(this.server + "/exist/rest" + XmldbURI.ROOT_COLLECTION_URI + "/" + collection + "/" + resourceName);
+			System.out.println("-->SUBIR-url: " + url2);
+			HttpURLConnection connect2 = (HttpURLConnection) url2.openConnection();
+			connect2.setRequestMethod("PUT");
+			connect2.setDoOutput(true);
+
+			String kodeaBase64 = getAuthorizationCode("admin", "admin");
+			connect2.setRequestProperty("Authorization", "Basic " + kodeaBase64);
+			connect2.setRequestProperty("ContentType", "aplication/xml");
+
+			byte[] postDataBytes = resource.getBytes();
+
+			System.out.println("-->SUBIR: resource : " + resource);
+			connect2.setRequestProperty("Content-Length", String.valueOf(postDataBytes.length));
+			connect2.setDoOutput(true);
+			connect2.getOutputStream().write(postDataBytes);
+			connect2.connect();
+			status = connect2.getResponseCode();
+			System.out.println("<--SUBIR: " + status);
+			System.out.println("<--SUBIR: " + connect2.getResponseMessage());
+		} else {
+			System.out.println("<--SUBIR: " + status);
+			System.out.println("<--SUBIR: " + connect.getResponseMessage());
+		}
 
 		return status;
 	}
 
+	/* -->DELETE borrar un recurso */
+	public int delete(String collection, String resourceName) throws IOException {
+		int status = 0;
+		String resource = new String();
+		URL url = new URL(
+				this.server + "/exist/rest" + XmldbURI.ROOT_COLLECTION_URI + "/" + collection + "/" + resourceName);
+		System.out.println("-->READ-url:" + url.toString());
+		HttpURLConnection connect = (HttpURLConnection) url.openConnection();
+		connect.setRequestMethod("DELETE");
+
+		/* Crear codigo de autorizacion y meter en la cabecera Authorization */
+		String codigoBase64 = getAuthorizationCode("admin", "admin");
+		connect.setRequestProperty("Authorization", "Basic " + codigoBase64);
+		connect.connect();
+		System.out.println("<--READ-status: " + connect.getResponseCode());
+
+		status = connect.getResponseCode();
+		System.out.println("<--BORRAR: " + status);
+		System.out.println("<--BORRAR: " + connect.getResponseMessage());
+
+		return status;
+
+	}
+
+
 	/* -->DELETE borrar coleccion */
-	public int delete(String collection) {
+	public int delete(String collection) throws IOException {
 		int status = 0;
 
-		// FALTA EL CODIGO
+		String resource = new String();
+		URL url = new URL(
+				this.server + "/exist/rest" + XmldbURI.ROOT_COLLECTION_URI + "/" + collection);
+		System.out.println("-->READ-url:" + url.toString());
+		HttpURLConnection connect = (HttpURLConnection) url.openConnection();
+		connect.setRequestMethod("DELETE");
+
+		/* Crear codigo de autorizacion y meter en la cabecera Authorization */
+		String codigoBase64 = getAuthorizationCode("admin", "admin");
+		connect.setRequestProperty("Authorization", "Basic " + codigoBase64);
+		connect.connect();
+		System.out.println("<--READ-status: " + connect.getResponseCode());
+
+		status = connect.getResponseCode();
+		System.out.println("<--BORRAR: " + status);
+		System.out.println("<--BORRAR: " + connect.getResponseMessage());
 
 		return status;
 	}
@@ -138,7 +223,64 @@ public class HTTPeXist {
 	public int create(String collection) throws IOException {
 		int status = 0;
 
-		// FALTA EL CODIGO
+		String resource = new String();
+		URL url = new URL(
+				this.server + "/exist/rest" + XmldbURI.ROOT_COLLECTION_URI + "/" + collection);
+		System.out.println("-->READ-url:" + url.toString());
+		HttpURLConnection connect = (HttpURLConnection) url.openConnection();
+		connect.setRequestMethod("PUT");
+		connect.setDoOutput(true);
+
+		/* Crear codigo de autorizacion y meter en la cabecera Authorization */
+		String codigoBase64 = getAuthorizationCode("admin", "admin");
+		connect.setRequestProperty("Authorization", "Basic " + codigoBase64);
+
+
+		status = connect.getResponseCode();
+		System.out.println("<--CREAR: " + status);
+		System.out.println("<--CREAR: " + connect.getResponseMessage());
+
+		return status;
+	}
+
+	public int create(String collection, String resourceName) throws IOException {
+		int status = 0;
+
+		URL url = new URL(
+				this.server + "/exist/rest" + XmldbURI.ROOT_COLLECTION_URI + "/" + collection);
+		System.out.println("-->READ-url:" + url.toString());
+		HttpURLConnection connect = (HttpURLConnection) url.openConnection();
+		connect.setRequestMethod("GET");
+		connect.connect();
+		status = connect.getResponseCode();
+
+		if(status == 404) {
+			URL url2 = new URL(this.server + "/exist/rest" + XmldbURI.ROOT_COLLECTION_URI + "/" + collection + "/" + null);
+			HttpURLConnection connect2 = (HttpURLConnection) url2.openConnection();
+			connect2.setRequestMethod("PUT");
+
+			String kodeaBase64 = getAuthorizationCode("admin", "admin");
+			connect2.setRequestProperty("Authorization", "Basic " + kodeaBase64);
+			connect2.setRequestProperty("ContentType", "aplication/xml");
+			connect2.connect();
+
+			status = connect2.getResponseCode();
+			System.out.println("<--SORTU-status: " + status);
+
+			delete(collection, "null");
+
+			if (!resourceName.isEmpty()) {
+				URL url3 = new URL(this.server + "/exist/rest" + XmldbURI.ROOT_COLLECTION_URI + "/" + collection + "/" + resourceName);
+				HttpURLConnection connect3 = (HttpURLConnection) url3.openConnection();
+				connect3.setRequestMethod("PUT");
+
+				connect3.setRequestProperty("Authorization", "Basic " + kodeaBase64);
+				connect3.setRequestProperty("ContentType", "aplication/xml");
+				connect3.connect();
+				status = connect3.getResponseCode();
+				System.out.println("<--SORTU-status: " + status);
+			}
+		}
 
 		return status;
 	}
