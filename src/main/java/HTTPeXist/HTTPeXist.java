@@ -69,17 +69,17 @@ public class HTTPeXist {
 		connect.setRequestProperty("Authorization", "Basic " + codigoBase64);
 		connect.connect();
 		System.out.println("<--READ-status: " + connect.getResponseCode());
-
-		/* Lee el contenido del mensaje de respuesta- RECURSO */
-		InputStream connectInputStream = connect.getInputStream();
-		InputStreamReader inputStreamReader = new InputStreamReader(connectInputStream);
-		BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-		String line;
-		while ((line = bufferedReader.readLine()) != null) {
-			lista = lista + line + "\n";
-			System.out.println("<--READ: " + line);
+		if (connect.getResponseCode()==200) {
+			/* Lee el contenido del mensaje de respuesta- RECURSO */
+			InputStream connectInputStream = connect.getInputStream();
+			InputStreamReader inputStreamReader = new InputStreamReader(connectInputStream);
+			BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+			String line;
+			while ((line = bufferedReader.readLine()) != null) {
+				lista = lista + line + "\n";
+				System.out.println("<--READ: " + line);
+			}
 		}
-
 		return lista;
 	}
 
@@ -148,8 +148,8 @@ public class HTTPeXist {
 			connect2.setRequestMethod("PUT");
 			connect2.setDoOutput(true);
 
-			String kodeaBase64 = getAuthorizationCode("admin", "admin");
-			connect2.setRequestProperty("Authorization", "Basic " + kodeaBase64);
+			String codigoBase64 = getAuthorizationCode("admin", "admin");
+			connect2.setRequestProperty("Authorization", "Basic " + codigoBase64);
 			connect2.setRequestProperty("ContentType", "aplication/xml");
 
 			byte[] postDataBytes = resource.getBytes();
@@ -197,22 +197,20 @@ public class HTTPeXist {
 
 	/* -->DELETE borrar coleccion */
 	public int delete(String collection) throws IOException {
-		int status = 0;
-
-		String resource = new String();
-		URL url = new URL(
-				this.server + "/exist/rest" + XmldbURI.ROOT_COLLECTION_URI + "/" + collection);
+		int status=0;
+		URL url = new URL(this.server + "/exist/rest" + XmldbURI.ROOT_COLLECTION_URI + "/" + collection);
 		System.out.println("-->READ-url:" + url.toString());
 		HttpURLConnection connect = (HttpURLConnection) url.openConnection();
 		connect.setRequestMethod("DELETE");
+		connect.setDoOutput(true);
 
-		/* Crear codigo de autorizacion y meter en la cabecera Authorization */
 		String codigoBase64 = getAuthorizationCode("admin", "admin");
 		connect.setRequestProperty("Authorization", "Basic " + codigoBase64);
-		connect.connect();
-		System.out.println("<--READ-status: " + connect.getResponseCode());
+		connect.setRequestProperty("ContentType", "aplication/xml");
 
 		status = connect.getResponseCode();
+
+
 		System.out.println("<--BORRAR: " + status);
 		System.out.println("<--BORRAR: " + connect.getResponseMessage());
 
