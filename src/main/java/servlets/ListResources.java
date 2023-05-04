@@ -26,9 +26,9 @@ public class ListResources extends HttpServlet {
 
 	
 	public void init(ServletConfig config) {
-		System.out.println("---> Entrando en init()de listResource");
+		System.out.println("---> Enter into  init() listResource");
 		eXist = new HTTPeXist("http://localHost:8080");
-		System.out.println("---> Saliendo de init()de LoginServlet");
+		System.out.println("---> Exit from init() listResource");
 	}
 	
 	
@@ -42,7 +42,7 @@ public class ListResources extends HttpServlet {
 		System.out.println("LIST_RESOURCE" + data);
 		if (data.equals("")) {
 			System.out.println("----LIST_RESOURCE" + data);
-			request.setAttribute("informacion", "Coleccion No Existe");
+			request.setAttribute("info", "Collection does not exist");
 			RequestDispatcher rd = request.getRequestDispatcher("/jsp/index.jsp");
 			rd.forward(request, response);
 		} 
@@ -61,7 +61,7 @@ public class ListResources extends HttpServlet {
 			request.setAttribute("collection", collection);
 			request.setAttribute("listaSVG", listaSVG);
 			System.out.println("     size:" + listaSVG.size());
-			System.out.println("     Redireccionando el usuario a imagenList.jsp");
+			System.out.println("     Redirecting user to imagenList.jsp");
 			RequestDispatcher rd = request.getRequestDispatcher("/jsp/imagenList.jsp");
 			rd.forward(request, response);
 		}

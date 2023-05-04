@@ -8,21 +8,21 @@
 
 <body>
 	<header>
-		<h1>Gestor Imágenes SVG en eXist</h1>
+		<h1>Gestor Imagenes SVG en eXist</h1>
 		<h3>SW 2022</h3>
 	</header>
 
-	<% if (request.getAttribute("informacion") != null) { %>
+	<% if (request.getAttribute("info") != null) { %>
 	<section>
-		<font>Informacion:</font>
-		<%=request.getAttribute("informacion")%>
+		<font>Information:</font>
+		<%=request.getAttribute("info")%>
 	</section>
 	<%	}%>
 
 	<section>
 		<form id="LeerRecursos" method="GET" action="/GestorSvg/apiLR">
 			<table>
-				<tr><td>Selecionar Colección:</td>
+				<tr><td>Selecionar Coleccion:</td>
 					<td><input id="collection" required name="collection" /></td>
 				</tr>
 			</table>
@@ -37,7 +37,7 @@
 				<tr><td>Nombre:</td>
 					<td><input id="resource" required name="svgName" /></td>
 				</tr>
-				<tr><td>Colección:</td>
+				<tr><td>Coleccion:</td>
 					<td><input id="collection" required name="collection" /></td>
 				</tr>
 			</table>
@@ -49,7 +49,7 @@
 	<section>
 		<form id="CrearColeccion" method="GET" action="/GestorSvg/apiCC">
 			<table>
-				<tr><td>Nombre Nueva Colección:</td>
+				<tr><td>Nombre Nueva Coleccion:</td>
 					<td><input id="collection" required name="collection" /></td>
 				</tr>
 			</table>
@@ -61,7 +61,7 @@
 	<section>
 		<form id="BorrarColeccion" method="GET" action="/GestorSvg/apiDC">
 			<table>
-				<tr><td>Selecionar Colección:</td>
+				<tr><td>Selecionar Coleccion:</td>
 					<td><input id="collection" required name="collection" /></td>
 				</tr>
 			</table>
@@ -70,6 +70,6 @@
 		<button id="index" form="BorrarColeccion">Borrar Coleccion</button>
 	</section>
 
-	<footer>Sistemas Web - Escuela Ingeniería de Bilbao</footer>
+	<footer>Sistemas Web - Escuela Ingenieria de Bilbao</footer>
 </body>
 </html>
