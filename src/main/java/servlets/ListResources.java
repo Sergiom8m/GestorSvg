@@ -24,17 +24,17 @@ public class ListResources extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private HTTPeXist eXist;
 
-	
-	public void init(ServletConfig config) {
-		System.out.println("---> Enter into  init() listResource");
-		eXist = new HTTPeXist("http://localHost:8080");
-		System.out.println("---> Exit from init() listResource");
-	}
-	
-	
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
 
+	public void init(ServletConfig config) {
+		System.out.println("---> Entrando en init()de listResource");
+		eXist = new HTTPeXist("http://localHost:8080");
+		System.out.println("---> Saliendo de init()de LoginServlet");
+	}
+
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+		System.out.println("---> Enter at doGet() ListResources");
 		String collection = "";
 		collection = request.getParameter("collection");
 		String data=""; data = eXist.list(collection);
@@ -45,31 +45,43 @@ public class ListResources extends HttpServlet {
 			request.setAttribute("info", "Collection does not exist");
 			RequestDispatcher rd = request.getRequestDispatcher("/jsp/index.jsp");
 			rd.forward(request, response);
-		} 
+		}
 		else {
 			Document doc = convertStringToXMLDocument(data);
 			NodeList valorNode = doc.getElementsByTagName("exist:resource");
-			System.out.println("valor " + valorNode.getLength());
-			System.out.println("valor " + valorNode.item(0).getTextContent());
-			listaSVG = new HashMap<String, String>();
-			for (int i = 0; i < valorNode.getLength(); i++) {
-				String nombre = valorNode.item(i).getAttributes().getNamedItem("name").getNodeValue();
-				String imagen = eXist.read(collection, nombre);
-				System.out.println("nombre: " + nombre);
-				listaSVG.put(nombre, imagen);
+			if(valorNode.getLength()!=0){
+				System.out.println("valor " + valorNode.getLength());
+				System.out.println("valor " + valorNode.item(0).getTextContent());
+				listaSVG = new HashMap<String, String>();
+				for (int i = 0; i < valorNode.getLength(); i++) {
+					String nombre = valorNode.item(i).getAttributes().getNamedItem("name").getNodeValue();
+					String imagen = eXist.read(collection, nombre);
+					System.out.println("nombre: " + nombre);
+					listaSVG.put(nombre, imagen);
+				}
+				request.setAttribute("collection", collection);
+				request.setAttribute("listaSVG", listaSVG);
+				System.out.println("     size:" + listaSVG.size());
+				System.out.println("     Redireccionando el usuario a imagenList.jsp");
+				RequestDispatcher rd = request.getRequestDispatcher("/jsp/imagenList.jsp");
+				rd.forward(request, response);
+			}else{
+				request.setAttribute("info", "No images at collection");
+
+				RequestDispatcher rd = request.getRequestDispatcher("/jsp/index.jsp");
+				response.setHeader("Cache-Control", "no-cache");
+				response.setDateHeader("Expires", 0);
+				rd.forward(request, response);
+
 			}
-			request.setAttribute("collection", collection);
-			request.setAttribute("listaSVG", listaSVG);
-			System.out.println("     size:" + listaSVG.size());
-			System.out.println("     Redirecting user to imagenList.jsp");
-			RequestDispatcher rd = request.getRequestDispatcher("/jsp/imagenList.jsp");
-			rd.forward(request, response);
+
 		}
+		System.out.println("---> Exit from doGet() ListResources");
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		
+
 		doGet(request, response);
 	}
 

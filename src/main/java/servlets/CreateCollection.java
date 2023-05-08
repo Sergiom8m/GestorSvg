@@ -35,7 +35,7 @@ public class CreateCollection extends HttpServlet {
 
         String collection = request.getParameter("collection");
 
-        int status = exist.create(collection, "");
+        int status = exist.create(collection);
 
         if (status == 201) {
             request.setAttribute("info", "Collection " + collection + " succesfully created");

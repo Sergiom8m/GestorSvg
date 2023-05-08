@@ -127,7 +127,6 @@ public class HTTPeXist {
 
 	}
 
-
 	/*-->SUBIR recurso en un String */
 	public int subirString(String collection, String resource, String resourceName) throws IOException {
 		int status = 0;
@@ -193,7 +192,6 @@ public class HTTPeXist {
 		return status;
 
 	}
-
 
 	/* -->DELETE borrar coleccion */
 	public int delete(String collection) throws IOException {
